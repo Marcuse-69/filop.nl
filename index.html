@@ -86,6 +86,32 @@
         <p>&copy; 2024 Filosofisch Panorama</p>
     </footer>
 
+    <button id="back-to-top" aria-label="Back to top">Top</button>
+
     <script src="js/main.js"></script>
+    <script>
+        // Pabc5
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            header.classList.toggle('sticky', window.scrollY > 0);
+        });
+
+        // P81dc
+        const backToTopButton = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
 </body>
 </html>
