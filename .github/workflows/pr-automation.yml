@@ -1,0 +1,32 @@
+name: PR Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  automation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Check if PR is from Copilot Workspace
+        id: check-source
+        run: |
+          if [[ ${{ github.event.pull_request.head.ref }} == *"copilot"* ]]; then
+            echo "::set-output name=is_copilot::true"
+          fi
+
+      - name: Auto-review if from Copilot
+        if: steps.check-source.outputs.is_copilot == 'true'
+        run: |
+          echo "PR from Copilot Workspace detected"
+          # Add review logic here
+
+      - name: Trigger deployment
+        if: github.event.review.state == 'approved'
+        run: |
+          echo "PR approved, triggering deployment"
+          # Add deployment trigger here
