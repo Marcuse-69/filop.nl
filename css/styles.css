@@ -6,12 +6,14 @@
     --max-width: 800px;
     --spacing: 1rem;
     --green-accent: #27ae60;
+    --secondary-color: #8e44ad; /* Secondary color */
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: all 0.3s ease; /* Add transition to all elements */
 }
 
 body {
@@ -50,6 +52,10 @@ nav a {
     text-decoration: none;
 }
 
+nav a:hover {
+    color: var(--accent-color); /* Add hover effect */
+}
+
 main {
     max-width: var(--max-width);
     margin: 0 auto;
@@ -84,10 +90,11 @@ h2 {
 }
 
 .les {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa, #e0e0e0); /* Add gradient */
     padding: 1.5rem;
     border-radius: 5px;
     border-left: 4px solid var(--accent-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box shadow */
 }
 
 .les h3 {
@@ -96,10 +103,11 @@ h2 {
 }
 
 #contact {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa, #e0e0e0); /* Add gradient */
     padding: 2rem;
     border-radius: 5px;
     text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box shadow */
 }
 
 #contact a {
@@ -129,6 +137,10 @@ footer {
     border-radius: 5px;
     cursor: pointer;
     display: none;
+}
+
+#back-to-top:hover {
+    background: var(--secondary-color); /* Add hover effect */
 }
 
 [aria-hidden="true"] {
