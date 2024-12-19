@@ -1,35 +1,48 @@
 name: Auto Deploy
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  push:
+    branches:
+      - '**'
 
 jobs:
-  auto-approve-and-merge:
+  auto-pr-and-deploy:
     runs-on: ubuntu-latest
-    if: github.actor == 'Marcuse-69' # Only for repository owner
+    if: github.actor == 'Marcuse-69'
     steps:
-      - name: Auto Approve PR
+      - uses: actions/checkout@v2
+
+      - name: Create PR if none exists
+        if: github.event_name == 'push' && !github.event.pull_request
         run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
-            -d '{"event":"APPROVE"}'
+          PR_BRANCH=${GITHUB_REF#refs/heads/}
+          if [ "$PR_BRANCH" != "main" ]; then
+            gh pr create --base main --head $PR_BRANCH --title "Auto PR from $PR_BRANCH" --body "Automated PR creation from Workspace"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto Approve PR
+        if: github.event.pull_request
+        run: |
+          gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Auto Merge PR
+        if: github.event.pull_request
         run: |
-          curl -X PUT \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge \
-            -d '{"merge_method":"squash"}'
+          gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   log-deployment:
-    needs: auto-approve-and-merge
+    needs: auto-pr-and-deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Create Deployment Log
+      - name: Log Deployment
         run: |
           echo "Deployment triggered at $(date)" >> deployment.log
-          echo "PR #${{ github.event.pull_request.number }} auto-merged" >> deployment.log
+          echo "Changes auto-processed from Workspace" >> deployment.log
